@@ -1,0 +1,11 @@
+﻿using SchoolOfDevs.Entities.Base;
+
+namespace SchoolOfDevs.Entities
+{
+    public class Course : BaseEntity
+    {
+        public string ?Name { get; set; }
+        public decimal Price { get; set; }
+
+    }
+}
