@@ -3,7 +3,15 @@
     public class BaseEntity
     {
         public int Id { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+        private DateTime _createdAt;
+
+        public DateTime CreatedAt
+        {
+            get { return _createdAt; }
+            set { _createdAt = value == null ? DateTime.Now : value; }
+        }
+
+        public DateTime UpdatedAt { get; set; }
     }
 }
