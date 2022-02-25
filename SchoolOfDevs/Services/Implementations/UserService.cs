@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolOfDevs.Context;
 using SchoolOfDevs.Dtos;
 using SchoolOfDevs.Entities;
+using SchoolOfDevs.Exceptions;
 using SchoolOfDevs.Repositories.Contracts;
 using SchoolOfDevs.Services.Contracts;
 using BC = BCrypt.Net.BCrypt;
@@ -32,7 +33,7 @@ namespace SchoolOfDevs.Services.Implementations
                 throw new Exception($"Usuário {userDto.UserName} já existe.");
 
             if (!userDto.Password.Equals(userDto.ConfirmPassword))
-                throw new Exception("A senha não confere com a confirmação.");
+                throw new BadRequestException("A senha não confere com a confirmação.");
 
             userDto.CreatedAt = DateTime.Now;
 
@@ -48,15 +49,17 @@ namespace SchoolOfDevs.Services.Implementations
         public async Task<UserDto> Update(UserDto userDto)
         {
             if (!userDto.Password.Equals(userDto.ConfirmPassword))
-                throw new Exception("A senha não confere com a confirmação.");
+                throw new BadRequestException("A senha não confere com a confirmação.");
 
             var user = await _context.Users
                 .AsNoTracking()
                 .SingleOrDefaultAsync(u => u.Id == userDto.Id);
 
+            if (user is null)
+                throw new KeyNotFoundException($"{user.Id} não existe.");
 
             if (!BC.Verify(userDto.Password, user.Password))
-                throw new Exception("As senhas não conferem.");
+                throw new BadRequestException("As senhas não conferem.");
 
             userDto.CreatedAt = user.CreatedAt;
             userDto.UpdatedAt = DateTime.Now;
