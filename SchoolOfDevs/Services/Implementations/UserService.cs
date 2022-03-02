@@ -13,12 +13,9 @@ namespace SchoolOfDevs.Services.Implementations
     public class UserService : IUserService
     {
         private readonly ApplicationDbContext _context;
-        //private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public UserService(IMapper mapper, ApplicationDbContext context) //IUserRepository userRepository
-                       
+        public UserService(IMapper mapper, ApplicationDbContext context)
         {
-            //_userRepository = userRepository;
             _mapper = mapper;
             _context = context;
         }
@@ -30,7 +27,7 @@ namespace SchoolOfDevs.Services.Implementations
                 .SingleOrDefaultAsync(u => u.UserName == userDto.UserName);
 
             if (user is not null)
-                throw new Exception($"Usuário {userDto.UserName} já existe.");
+                throw new KeyNotFoundException($"Usuário {userDto.UserName} já existe.");
 
             if (!userDto.Password.Equals(userDto.ConfirmPassword))
                 throw new BadRequestException("A senha não confere com a confirmação.");

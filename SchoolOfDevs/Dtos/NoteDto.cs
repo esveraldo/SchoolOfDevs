@@ -6,5 +6,7 @@ namespace SchoolOfDevs.Dtos
     {
         public int Id { get; set; }
         public decimal Value { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

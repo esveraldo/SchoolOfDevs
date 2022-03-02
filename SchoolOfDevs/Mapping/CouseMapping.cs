@@ -15,6 +15,8 @@ namespace SchoolOfDevs.Mapping
             builder.Property(x => x.Price)
                 .HasColumnType("decimal(18, 2)")
                 .IsRequired();
+
+            builder.HasMany(x => x.Notes).WithOne(x => x.Course).HasForeignKey(x => x.CourseId);
         }
     }
 }

@@ -14,5 +14,11 @@ namespace SchoolOfDevs.Entities
         [NotMapped]
         public string? ConfirmPassword { get; set; }
         public TypeUserEnum TypeUser { get; set; }
+
+        //EF
+        public virtual ICollection<Note>? Notes { get; set; }
+        //REALCIONAMENTO MUITOS PARA MUITOS
+        public virtual ICollection<Course>? Courses { get; set; }
+        public virtual List<UserCourse>? UserCourses { get; set; }
     }
 }

@@ -26,6 +26,7 @@ namespace SchoolOfDevs.Mapping
                 .HasConversion(x => x.ToString(), x => (TypeUserEnum)Enum.Parse(typeof(TypeUserEnum), x))
                 .HasColumnType("varchar(20)");
 
+            builder.HasMany(x => x.Notes).WithOne(x => x.User).HasForeignKey(x => x.UserId);
         }
     }
 }

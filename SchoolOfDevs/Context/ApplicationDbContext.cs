@@ -15,6 +15,7 @@ namespace SchoolOfDevs.Context
         public DbSet<User> ?Users { get; set; }
         public DbSet<Course> ?Courses { get; set; }
         public DbSet<Note> ?Notes { get; set; }
+        public DbSet<UserCourse> UserCourses { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -22,6 +23,7 @@ namespace SchoolOfDevs.Context
             modelBuilder.ApplyConfiguration(new UserMapping());
             modelBuilder.ApplyConfiguration(new NoteMapping());
             modelBuilder.ApplyConfiguration(new CouseMapping());
+            modelBuilder.ApplyConfiguration(new UserCourseMapping());
 
             base.OnModelCreating(modelBuilder);
         }
