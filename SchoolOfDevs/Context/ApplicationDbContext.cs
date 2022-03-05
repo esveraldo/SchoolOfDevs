@@ -31,11 +31,6 @@ namespace SchoolOfDevs.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Server=localhost;Database=schoolofdevs;Trusted_Connection=False;MultipleActiveResultSets=true;user id=sa;password=esve6140");
-            }
-
             base.OnConfiguring(optionsBuilder);
         }
     }
