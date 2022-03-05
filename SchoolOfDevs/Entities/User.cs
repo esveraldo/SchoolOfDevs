@@ -11,6 +11,7 @@ namespace SchoolOfDevs.Entities
         public int Age { get; set; }
         public string? UserName { get; set; }
         public string? Password { get; set; }
+        public string? Role { get; set; }
         [NotMapped]
         public string? ConfirmPassword { get; set; }
         public TypeUserEnum TypeUser { get; set; }

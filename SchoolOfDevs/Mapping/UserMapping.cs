@@ -22,6 +22,9 @@ namespace SchoolOfDevs.Mapping
             builder.Property(x => x.Password)
                 .HasColumnType("varchar(100)")
                 .IsRequired();
+            builder.Property(x => x.Role)
+                .HasColumnType("varchar(100)")
+                .IsRequired();
             builder.Property(x => x.TypeUser)
                 .HasConversion(x => x.ToString(), x => (TypeUserEnum)Enum.Parse(typeof(TypeUserEnum), x))
                 .HasColumnType("varchar(20)");

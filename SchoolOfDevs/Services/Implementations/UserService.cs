@@ -6,6 +6,7 @@ using SchoolOfDevs.Entities;
 using SchoolOfDevs.Exceptions;
 using SchoolOfDevs.Repositories.Contracts;
 using SchoolOfDevs.Services.Contracts;
+using System.Linq;
 using BC = BCrypt.Net.BCrypt;
 
 namespace SchoolOfDevs.Services.Implementations
@@ -18,6 +19,15 @@ namespace SchoolOfDevs.Services.Implementations
         {
             _mapper = mapper;
             _context = context;
+        }
+
+        public async Task<UserDto> Login(UserDto userDto)
+        {
+            var user = await _context.Users
+                .AsNoTracking()
+                .SingleOrDefaultAsync(u => u.UserName == userDto.UserName && u.Password == userDto.Password);
+
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task<UserDto> Create(UserDto userDto)

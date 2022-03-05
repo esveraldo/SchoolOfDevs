@@ -8,5 +8,6 @@ namespace SchoolOfDevs.Services.Contracts
     {
         public Task<UserDto> Create(UserDto userDto);
         public Task<UserDto> Update(UserDto userDto);
+        public Task<UserDto> Login(UserDto userDto);
     }
 }

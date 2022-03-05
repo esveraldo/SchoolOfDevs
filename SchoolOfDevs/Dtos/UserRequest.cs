@@ -17,6 +17,8 @@ namespace SchoolOfDevs.Dtos
         [Required(ErrorMessage = "O registro {0} é requerido")]
         public string? Password { get; set; }
         public string? ConfirmPassword { get; set; }
+        [Required(ErrorMessage = "O registro {0} é requerido")]
+        public string? Role { get; set; }
         public TypeUserEnumDTO TypeUser { get; set; }
     }
 }

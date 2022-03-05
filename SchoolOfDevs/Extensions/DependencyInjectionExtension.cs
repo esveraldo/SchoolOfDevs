@@ -15,6 +15,7 @@ namespace SchoolOfDevs.Extensions
 
             //Services
             services.AddScoped<IUserService, UserService>();
+            services.AddTransient<ITokenService, TokenService>();
         }
     }
 }

@@ -3,10 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using SchoolOfDevs.Context;
 using SchoolOfDevs.Dtos;
 using SchoolOfDevs.Entities;
+using SchoolOfDevs.Services.Contracts;
 
 namespace SchoolOfDevs.Services.Implementations
 {
-    public class CourseService
+    public class CourseService : ICourseService
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolOfDevs.Dtos;
 using SchoolOfDevs.Entities;
@@ -14,16 +15,19 @@ namespace SchoolOfDevs.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
+        private readonly ITokenService _tokenService;
 
-        public UsersController(ILogger<UsersController> logger, IUserRepository userRepository, IUserService userService)
+        public UsersController(ILogger<UsersController> logger, IUserRepository userRepository, IUserService userService, ITokenService tokenService)
         {
             _logger = logger;
             _userRepository = userRepository;
             _userService = userService;
+            _tokenService = tokenService;
         }
 
         [HttpGet]
         [Route("listar-todos-usuarios")]
+        [AllowAnonymous]//QUALQUER USUÁRIO PODE ACESSAR ESSE MÉTODO
         public async Task<IActionResult> GetAll()
         {
             var result = await _userRepository.GetAll();
@@ -32,14 +36,24 @@ namespace SchoolOfDevs.Controllers
 
         [HttpGet]
         [Route("usuario-selecionado/{id}")]
+        //[Authorize]//SÓ USUÁRIOS AUTENTICADOS PODEM ACESSAR ESSE MÉTODO
         public async Task<IActionResult> Get(int id)
         {
             var result = await _userRepository.Get(id);
             return Ok(result);
         }
 
+        //[HttpGet]
+        //[Route("Autenticado")]
+        //[Authorize]
+        //public string Autenticado()
+        //{
+        //    return $"Autenticado - {UserDto.Identity.Name}";
+        //}
+
         [HttpPost]
         [Route("gravar-usuario")]
+        //[Authorize(Roles = "Gerente")]//SOMENTE USUÁRIOS COM STATUS DE GERENTE PODEM ACESSAR ESSE MÉTODO
         public async Task<IActionResult> Create([FromBody] UserRequest userRequest)
         {
             if (!ModelState.IsValid) return BadRequest("O Modelo está incorreto.");
@@ -63,6 +77,28 @@ namespace SchoolOfDevs.Controllers
 
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpPost]
+        [Route("login")]
+        public async Task<ActionResult> Authenticate([FromBody] UserDto userDto)
+        {
+            var u = await _userService.Login(userDto);
+
+            if (userDto == null)
+                return NotFound(new { message = "Usuário ou senha inválidos" });
+
+            var token = _tokenService.GenerateToken(u);
+
+            u.Password = "";
+
+            var result = new
+            {
+                user = u,
+                token = token
+            };
+
+            return Ok(result);
         }
 
         [HttpPut]
