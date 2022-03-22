@@ -1,33 +1,32 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SchoolOfDevs.Context;
 using SchoolOfDevs.Dtos;
 using SchoolOfDevs.Entities;
 using SchoolOfDevs.Exceptions;
 using SchoolOfDevs.Repositories.Contracts;
+using SchoolOfDevs.Security;
 using SchoolOfDevs.Services.Contracts;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using BC = BCrypt.Net.BCrypt;
 
 namespace SchoolOfDevs.Services.Implementations
 {
     public class UserService : IUserService
     {
+        private readonly AppSettings _appSettings;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        public UserService(IMapper mapper, ApplicationDbContext context)
+        public UserService(IMapper mapper, ApplicationDbContext context, IOptions<AppSettings> appSettings)
         {
             _mapper = mapper;
             _context = context;
-        }
-
-        public async Task<UserDto> Login(UserDto userDto)
-        {
-            var user = await _context.Users
-                .AsNoTracking()
-                .SingleOrDefaultAsync(u => u.UserName == userDto.UserName && u.Password == userDto.Password);
-
-            return _mapper.Map<UserDto>(user);
+            _appSettings = appSettings.Value;
         }
 
         public async Task<UserDto> Create(UserDto userDto)
@@ -79,6 +78,14 @@ namespace SchoolOfDevs.Services.Implementations
             _context.Entry(updateUser).State = EntityState.Modified;   
             await _context.SaveChangesAsync();
             return userDto;
+        }
+
+        public User Get(string username, string password)
+        {
+            var users = new List<User>();
+            users.Add(new User { Id = 1, UserName = "batman", Password = "batman", Role = "admin" });
+            users.Add(new User { Id = 2, UserName = "robin", Password = "robin", Role = "empregado" });
+            return users.Where(x => x.UserName.ToLower() == username.ToLower() && x.Password == password).FirstOrDefault();
         }
     }
 }

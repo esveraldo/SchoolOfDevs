@@ -11,6 +11,8 @@ namespace SchoolOfDevs.Extensions
             var autoMapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<User, UserDto>().ReverseMap();
+                cfg.CreateMap<UserDto, UserAuthRequest>().ReverseMap();
+                cfg.CreateMap<User, UserAuthRequest>().ReverseMap();
             });
 
             services.AddSingleton(autoMapperConfig.CreateMapper());

@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolOfDevs.Dtos;
-using SchoolOfDevs.Entities;
 using SchoolOfDevs.Repositories.Contracts;
+using SchoolOfDevs.Security;
 using SchoolOfDevs.Services.Contracts;
 
 namespace SchoolOfDevs.Controllers
@@ -15,28 +16,46 @@ namespace SchoolOfDevs.Controllers
         private readonly ILogger<UsersController> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
-        private readonly ITokenService _tokenService;
 
-        public UsersController(ILogger<UsersController> logger, IUserRepository userRepository, IUserService userService, ITokenService tokenService)
+        public UsersController(ILogger<UsersController> logger, IUserRepository userRepository, IUserService userService)
         {
             _logger = logger;
             _userRepository = userRepository;
             _userService = userService;
-            _tokenService = tokenService;
         }
 
         [HttpGet]
+        [Route("anonymous")]
+        [AllowAnonymous]
+        public string Anonymous() => "Anônimo";
+
+        [HttpGet]
+        [Route("authenticated")]
+        [Authorize]
+        public string Authenticated() => String.Format("Autenticado - {0}", User.Identity.Name);
+
+        [HttpGet]
+        [Route("employee")]
+        [Authorize(Roles = "employee,manager")]
+        public string Employee() => "Funcionário";
+
+        [HttpGet]
+        [Route("manager")]
+        [Authorize(Roles = "manager")]
+        public string Manager() => "Gerente";
+
+        [AllowAnonymous]
+        [HttpGet]
         [Route("listar-todos-usuarios")]
-        [AllowAnonymous]//QUALQUER USUÁRIO PODE ACESSAR ESSE MÉTODO
         public async Task<IActionResult> GetAll()
         {
             var result = await _userRepository.GetAll();
             return Ok(result);
         }
 
+        [Authorize(Roles = "manager")]
         [HttpGet]
         [Route("usuario-selecionado/{id}")]
-        //[Authorize]//SÓ USUÁRIOS AUTENTICADOS PODEM ACESSAR ESSE MÉTODO
         public async Task<IActionResult> Get(int id)
         {
             var result = await _userRepository.Get(id);
@@ -51,6 +70,7 @@ namespace SchoolOfDevs.Controllers
         //    return $"Autenticado - {UserDto.Identity.Name}";
         //}
 
+        [AllowAnonymous]//QUALQUER USUÁRIO PODE ACESSAR ESSE MÉTODO
         [HttpPost]
         [Route("gravar-usuario")]
         //[Authorize(Roles = "Gerente")]//SOMENTE USUÁRIOS COM STATUS DE GERENTE PODEM ACESSAR ESSE MÉTODO
@@ -67,6 +87,7 @@ namespace SchoolOfDevs.Controllers
                 userDto.UserName = userRequest.UserName;
                 userDto.Password = userRequest.Password;
                 userDto.ConfirmPassword = userRequest.ConfirmPassword;
+                userDto.Role = userRequest.Role;
 
                 await _userService.Create(userDto);
 
@@ -81,24 +102,27 @@ namespace SchoolOfDevs.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<ActionResult> Authenticate([FromBody] UserDto userDto)
+        public async Task<ActionResult<dynamic>> Authenticate([FromBody] UserAuthRequest authRequest)
         {
-            var u = await _userService.Login(userDto);
+            // Recupera o usuário
+            var user = UserRepository.Get(authRequest.UserName, authRequest.Password);
 
-            if (userDto == null)
+            // Verifica se o usuário existe
+            if (user == null)
                 return NotFound(new { message = "Usuário ou senha inválidos" });
 
-            var token = _tokenService.GenerateToken(u);
+            // Gera o Token
+            var token = TokenService.GenerateToken(user);
 
-            u.Password = "";
+            // Oculta a senha
+            user.Password = "";
 
-            var result = new
+            // Retorna os dados
+            return new
             {
-                user = u,
+                user = user,
                 token = token
             };
-
-            return Ok(result);
         }
 
         [HttpPut]
@@ -118,6 +142,7 @@ namespace SchoolOfDevs.Controllers
                 userDto.UserName = userRequest.UserName;
                 userDto.Password = userRequest.Password;
                 userDto.ConfirmPassword = userRequest.ConfirmPassword;
+                userDto.Role = userRequest.Role;
 
                 await _userService.Update(userDto);
 

@@ -7,7 +7,7 @@ namespace SchoolOfDevs.Extensions
 {
     public static class DependencyInjectionExtension
     {
-        public static void AddRegisterServices( this IServiceCollection services)
+        public static void AddRegisterServices( this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<INoteRepository, NoteRepository>();
@@ -15,7 +15,9 @@ namespace SchoolOfDevs.Extensions
 
             //Services
             services.AddScoped<IUserService, UserService>();
-            services.AddTransient<ITokenService, TokenService>();
+
+            //Singleton
+            services.AddSingleton<IConfiguration>(configuration);
         }
     }
 }
